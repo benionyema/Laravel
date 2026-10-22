@@ -1,0 +1,30 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          APP_PATH: ${{ secrets.APP_PATH }}
+        with:
+          host: vps12.informaticamajada.es
+          port: 2222
+          username: benedit
+          key: ${{ secrets.PRIVATE_KEY }}
+          envs: APP_PATH
+          script: |
+            set -eu
+            cd "$APP_PATH"
+            git pull --ff-only origin main
+            composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+            npm ci
+            npm run build
+            php artisan optimize
