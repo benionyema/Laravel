@@ -28,3 +28,4 @@ jobs:
             npm ci
             npm run build
             php artisan optimize
+            sudo -n /usr/sbin/service php8.5-fpm reload
